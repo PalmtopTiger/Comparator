@@ -4,22 +4,22 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-TARGET = Comparator
 TEMPLATE = app
 
+QT += core gui widgets
 
-SOURCES += main.cpp\
-        mainwindow.cpp
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS += \
+    mainwindow.h \
     sheet.h
 
-FORMS    += mainwindow.ui
+FORMS += mainwindow.ui
 
 RESOURCES += Comparator.qrc
 
 RC_FILE = Comparator.rc
+
+TARGET = Comparator
