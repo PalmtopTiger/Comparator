@@ -7,24 +7,24 @@
 class Sheet
 {
 public:
-	Sheet() :
+    Sheet() :
         pixmap(NULL),
         scene(NULL),
-		scaled(false)
-	{}
+        scaled(false)
+    {}
     ~Sheet() { this->clear(); }
 
-	void clear()
-	{
-		delete scene;
-		delete pixmap;
-	}
+    void clear()
+    {
+        delete scene;
+        delete pixmap;
+    }
 
-	QPixmap* pixmap;
-	QGraphicsScene* scene;
+    QPixmap* pixmap;
+    QGraphicsScene* scene;
 
-	QString name;
-	bool scaled;
+    QString name;
+    bool scaled;
 };
 
 #endif // SHEET_H
