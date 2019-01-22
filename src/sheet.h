@@ -8,8 +8,8 @@ class Sheet
 {
 public:
     Sheet() :
-        pixmap(NULL),
-        scene(NULL),
+        pixmap(nullptr),
+        scene(nullptr),
         scaled(false)
     {}
     ~Sheet() { this->clear(); }
