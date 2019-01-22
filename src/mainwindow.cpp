@@ -18,8 +18,16 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->setupUi(this);
 	ui->graphicsView->setAcceptDrops(false);
 	setAcceptDrops(true);
-    this->shortcutSwitch = new QShortcut(Qt::Key_Space, this);
-    connect(this->shortcutSwitch, SIGNAL(activated()), this, SLOT(on_btSwitch_clicked()));
+    this->shortcutSwitch       = new QShortcut(Qt::Key_Space,  this);
+    this->shortcutZoomIn       = new QShortcut(Qt::Key_Plus,   this);
+    this->shortcutZoomOut      = new QShortcut(Qt::Key_Minus,  this);
+    this->shortcutZoomReset0   = new QShortcut(Qt::Key_0,      this);
+    this->shortcutZoomResetIns = new QShortcut(Qt::Key_Insert, this);
+    connect(this->shortcutSwitch,       SIGNAL(activated()), this, SLOT(on_btSwitch_clicked()));
+    connect(this->shortcutZoomIn,       SIGNAL(activated()), this, SLOT(zoomIn()));
+    connect(this->shortcutZoomOut,      SIGNAL(activated()), this, SLOT(zoomOut()));
+    connect(this->shortcutZoomReset0,   SIGNAL(activated()), this, SLOT(zoomReset()));
+    connect(this->shortcutZoomResetIns, SIGNAL(activated()), this, SLOT(zoomReset()));
 
     this->palettePassive = this->paletteActive = ui->btOpen1->palette();
     this->paletteActive.setColor(QPalette::Button, Qt::green);
@@ -113,6 +121,21 @@ void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
 {
     Q_UNUSED(pos);
 	on_btSwitch_clicked();
+}
+
+void MainWindow::zoomIn()
+{
+    ui->slZoom->triggerAction(QAbstractSlider::SliderPageStepAdd);
+}
+
+void MainWindow::zoomOut()
+{
+    ui->slZoom->triggerAction(QAbstractSlider::SliderPageStepSub);
+}
+
+void MainWindow::zoomReset()
+{
+    ui->slZoom->setValue(100);
 }
 
 

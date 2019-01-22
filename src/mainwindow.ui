@@ -172,8 +172,8 @@
         <property name="maximum">
          <number>1000</number>
         </property>
-        <property name="singleStep">
-         <number>1</number>
+        <property name="pageStep">
+         <number>50</number>
         </property>
         <property name="value">
          <number>100</number>

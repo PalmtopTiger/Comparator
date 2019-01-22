@@ -25,6 +25,9 @@ private slots:
 	void on_slZoom_valueChanged(int value);
 	void on_slZoom_customContextMenuRequested(const QPoint &pos);
 	void on_graphicsView_customContextMenuRequested(const QPoint &pos);
+    void zoomIn();
+    void zoomOut();
+    void zoomReset();
 
 private:
 	Ui::MainWindow *ui;
@@ -33,6 +36,10 @@ private:
     QPalette palettePassive;
     QPalette paletteActive;
     QShortcut* shortcutSwitch;
+    QShortcut* shortcutZoomIn;
+    QShortcut* shortcutZoomOut;
+    QShortcut* shortcutZoomReset0;
+    QShortcut* shortcutZoomResetIns;
     QVector<Sheet> sheet;
 
 	void dragEnterEvent(QDragEnterEvent *event);
