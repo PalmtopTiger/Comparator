@@ -37,14 +37,15 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowState(Qt::WindowMaximized);
 
     QSet<QString> formatsSet;
-    foreach (const QByteArray& format, QImageReader::supportedImageFormats())
+    const QByteArrayList supportedImageFormats = QImageReader::supportedImageFormats();
+    for (const QByteArray& format : supportedImageFormats)
     {
         formatsSet.insert(QString(format).toLower());
     }
     this->imageFormats = formatsSet.toList();
     this->imageFormats.sort();
     QStringList imageFormatsFilterList;
-    foreach (const QString& format, this->imageFormats)
+    for (const QString& format : qAsConst(this->imageFormats))
     {
         imageFormatsFilterList.append("*." + format);
     }
@@ -60,7 +61,8 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
     if (event->mimeData()->hasUrls())
     {
-        foreach (const QUrl &url, event->mimeData()->urls())
+        const QList<QUrl> urls = event->mimeData()->urls();
+        for (const QUrl &url : urls)
         {
             if (!this->urlToPath(url).isEmpty())
             {
