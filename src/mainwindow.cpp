@@ -36,20 +36,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setWindowState(Qt::WindowMaximized);
 
-    QSet<QString> formatsSet;
     const QByteArrayList supportedImageFormats = QImageReader::supportedImageFormats();
     for (const QByteArray& format : supportedImageFormats)
     {
-        formatsSet.insert(QString(format).toLower());
+        this->imageFormats.append(format);
     }
-    this->imageFormats = formatsSet.toList();
     this->imageFormats.sort();
-    QStringList imageFormatsFilterList;
-    for (const QString& format : qAsConst(this->imageFormats))
-    {
-        imageFormatsFilterList.append("*." + format);
-    }
-    this->imageFormatsFilter = QString("Изображения (%1)").arg(imageFormatsFilterList.join(" "));
+    this->imageFormatsFilter = QString("Изображения (*.%1)").arg(this->imageFormats.join(" *."));
 }
 
 MainWindow::~MainWindow()
@@ -103,9 +96,9 @@ void MainWindow::on_btSwitch_clicked()
     switchImage();
 }
 
-void MainWindow::on_slZoom_valueChanged(int value)
+void MainWindow::on_slZoom_valueChanged(const int value)
 {
-    qreal factor = static_cast<qreal>(value) / 100.0;
+    const qreal factor = static_cast<qreal>(value) / 100.0;
 
     ui->graphicsView->resetTransform();
     ui->graphicsView->scale(factor, factor);
@@ -141,7 +134,7 @@ void MainWindow::zoomReset()
 }
 
 
-void MainWindow::loadImage(QString fileName, int pos)
+void MainWindow::loadImage(QString fileName, const int pos)
 {
     if (fileName.isEmpty())
     {
@@ -159,7 +152,7 @@ void MainWindow::loadImage(QString fileName, int pos)
     this->sheet[pos].scene = new QGraphicsScene();
     this->sheet[pos].pixmap = new QPixmap(fileName);
 
-    int other = (pos + 1) % this->sheet.size();
+    const int other = (pos + 1) % this->sheet.size();
 
     // Масштабируем
     if ( this->sheet[other].pixmap && this->sheet[other].scene &&
@@ -238,7 +231,7 @@ void MainWindow::loadImage(QString fileName, int pos)
     }*/
 }
 
-void MainWindow::switchImage(int pos)
+void MainWindow::switchImage(const int pos)
 {
     static int lastPos = this->sheet.size() - 1;
 
@@ -275,7 +268,7 @@ void MainWindow::switchImage(int pos)
 
 QString MainWindow::urlToPath(const QUrl &url)
 {
-    QString path = url.toLocalFile();
+    const QString path = url.toLocalFile();
 
     if (!path.isEmpty() && this->imageFormats.contains(QFileInfo(path).suffix(), Qt::CaseInsensitive))
     {
