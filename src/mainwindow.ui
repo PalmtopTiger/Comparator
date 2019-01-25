@@ -10,6 +10,9 @@
     <height>301</height>
    </rect>
   </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
    <string>Comparator</string>
   </property>
@@ -23,6 +26,9 @@
      <widget class="QGraphicsView" name="graphicsView">
       <property name="contextMenuPolicy">
        <enum>Qt::CustomContextMenu</enum>
+      </property>
+      <property name="acceptDrops">
+       <bool>false</bool>
       </property>
       <property name="verticalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -57,6 +63,9 @@
           <height>23</height>
          </size>
         </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>Изображение 1</string>
         </property>
@@ -81,6 +90,9 @@
           <width>91</width>
           <height>23</height>
          </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
         </property>
         <property name="text">
          <string>Изображение 2</string>

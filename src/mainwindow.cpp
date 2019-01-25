@@ -16,8 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
     sheet(2)
 {
     ui->setupUi(this);
-    ui->graphicsView->setAcceptDrops(false);
-    setAcceptDrops(true);
     this->shortcutSwitch       = new QShortcut(Qt::Key_Space,  this);
     this->shortcutZoomIn       = new QShortcut(Qt::Key_Plus,   this);
     this->shortcutZoomOut      = new QShortcut(Qt::Key_Minus,  this);
@@ -31,8 +29,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->palettePassive = this->paletteActive = ui->btOpen1->palette();
     this->paletteActive.setColor(QPalette::Button, Qt::green);
-    ui->btOpen1->setAutoFillBackground(true);
-    ui->btOpen2->setAutoFillBackground(true);
 
     this->setWindowState(Qt::WindowMaximized);
 
