@@ -70,6 +70,7 @@ void MainWindow::dropEvent(QDropEvent *event)
                 loadImage(path, i);
             }
         }
+        event->acceptProposedAction();
     }
 }
 
@@ -95,7 +96,7 @@ void MainWindow::on_slZoom_valueChanged(const int value)
     ui->graphicsView->resetTransform();
     ui->graphicsView->scale(factor, factor);
 
-    ui->edPercent->setText(QString::number(value) + QString("%"));
+    ui->edPercent->setText(QString("%1%").arg(value));
 }
 
 void MainWindow::on_slZoom_customContextMenuRequested(const QPoint &pos)
@@ -132,7 +133,7 @@ void MainWindow::loadImage(QString fileName, const int pos)
     {
         QSettings settings;
         fileName = QFileDialog::getOpenFileName(this,
-                                                QString("Выберите изображение ") + QString::number(pos + 1),
+                                                QString("Выберите изображение %1").arg(pos + 1),
                                                 settings.value(DEFAULT_DIR_KEY).toString(),
                                                 this->imageFormatsFilter);
 
