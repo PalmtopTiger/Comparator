@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QShortcut>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QSettings>
@@ -16,16 +17,11 @@ MainWindow::MainWindow(QWidget *parent) :
     sheet(2)
 {
     ui->setupUi(this);
-    this->shortcutSwitch       = new QShortcut(Qt::Key_Space,  this);
-    this->shortcutZoomIn       = new QShortcut(Qt::Key_Plus,   this);
-    this->shortcutZoomOut      = new QShortcut(Qt::Key_Minus,  this);
-    this->shortcutZoomReset0   = new QShortcut(Qt::Key_0,      this);
-    this->shortcutZoomResetIns = new QShortcut(Qt::Key_Insert, this);
-    connect(this->shortcutSwitch,       SIGNAL(activated()), this, SLOT(on_btSwitch_clicked()));
-    connect(this->shortcutZoomIn,       SIGNAL(activated()), this, SLOT(zoomIn()));
-    connect(this->shortcutZoomOut,      SIGNAL(activated()), this, SLOT(zoomOut()));
-    connect(this->shortcutZoomReset0,   SIGNAL(activated()), this, SLOT(zoomReset()));
-    connect(this->shortcutZoomResetIns, SIGNAL(activated()), this, SLOT(zoomReset()));
+    connect(new QShortcut(Qt::Key_Space,  this), &QShortcut::activated, this, &MainWindow::on_btSwitch_clicked);
+    connect(new QShortcut(Qt::Key_Plus,   this), &QShortcut::activated, this, &MainWindow::zoomIn);
+    connect(new QShortcut(Qt::Key_Minus,  this), &QShortcut::activated, this, &MainWindow::zoomOut);
+    connect(new QShortcut(Qt::Key_0,      this), &QShortcut::activated, this, &MainWindow::zoomReset);
+    connect(new QShortcut(Qt::Key_Insert, this), &QShortcut::activated, this, &MainWindow::zoomReset);
 
     this->palettePassive = this->paletteActive = ui->btOpen1->palette();
     this->paletteActive.setColor(QPalette::Button, Qt::green);

@@ -4,7 +4,6 @@
 #include "sheet.h"
 #include <QMainWindow>
 #include <QUrl>
-#include <QShortcut>
 
 namespace Ui {
     class MainWindow;
@@ -35,11 +34,6 @@ private:
     QString imageFormatsFilter;
     QPalette palettePassive;
     QPalette paletteActive;
-    QShortcut* shortcutSwitch;
-    QShortcut* shortcutZoomIn;
-    QShortcut* shortcutZoomOut;
-    QShortcut* shortcutZoomReset0;
-    QShortcut* shortcutZoomResetIns;
     QVector<Sheet> sheet;
 
     void dragEnterEvent(QDragEnterEvent *event);
