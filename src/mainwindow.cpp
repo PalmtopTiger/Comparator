@@ -261,12 +261,11 @@ void MainWindow::switchImage(const int pos)
 
 QString MainWindow::urlToPath(const QUrl &url)
 {
-    const QString path = url.toLocalFile();
-
-    if (!path.isEmpty() && this->imageFormats.contains(QFileInfo(path).suffix(), Qt::CaseInsensitive))
-    {
-        return path;
+    if (url.isLocalFile()) {
+        const QString path = url.toLocalFile();
+        if (this->imageFormats.contains(QFileInfo(path).suffix(), Qt::CaseInsensitive)) {
+            return path;
+        }
     }
-
     return QString::null;
 }
