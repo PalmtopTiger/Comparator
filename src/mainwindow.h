@@ -23,6 +23,7 @@ private slots:
     void on_btOpen2_clicked();
     void on_btSwitch_clicked();
     void on_slZoom_valueChanged(const int value);
+    void on_spZoom_valueChanged(const int value);
     void on_slZoom_customContextMenuRequested(const QPoint &pos);
     void zoomIn();
     void zoomOut();
@@ -41,6 +42,7 @@ private:
 
     void loadImage(const int pos, QString fileName = QString::null);
     void switchImage(const int pos = INT_MAX);
+    void setZoom(const int value);
     QString urlToPath(const QUrl &url);
 
 protected:

@@ -133,12 +133,14 @@ void MainWindow::on_btSwitch_clicked()
 
 void MainWindow::on_slZoom_valueChanged(const int value)
 {
-    const qreal factor = static_cast<qreal>(value) / 100.0;
+    setZoom(value);
+    ui->spZoom->setValue(value);
+}
 
-    ui->graphicsView->resetTransform();
-    ui->graphicsView->scale(factor, factor);
-
-    ui->edPercent->setText(QString("%1%").arg(value));
+void MainWindow::on_spZoom_valueChanged(const int value)
+{
+    setZoom(value);
+    ui->slZoom->setValue(value);
 }
 
 void MainWindow::on_slZoom_customContextMenuRequested(const QPoint &pos)
@@ -159,7 +161,11 @@ void MainWindow::zoomOut()
 
 void MainWindow::zoomReset()
 {
-    if (ui->slZoom->isEnabled()) ui->slZoom->setValue(100);
+    if (ui->slZoom->isEnabled()) {
+        setZoom(100);
+        ui->slZoom->setValue(100);
+        ui->spZoom->setValue(100);
+    }
 }
 
 
@@ -234,8 +240,10 @@ void MainWindow::loadImage(const int pos, QString fileName)
     current.name = QFileInfo(fileName).fileName();
     (pos ? ui->btOpen2 : ui->btOpen1)->setText(current.name);
 
-    // Центрирование изображения
+    // Центрирование изображения (не менять на zoomReset - кнопки отключены)
+    setZoom(100);
     ui->slZoom->setValue(100);
+    ui->spZoom->setValue(100);
     switchImage(pos);
     ui->graphicsView->centerOn(QPointF(current.scene->width() / 2.0,
                                        current.scene->height() / 2.0));
@@ -254,6 +262,7 @@ void MainWindow::loadImage(const int pos, QString fileName)
     ui->graphicsView->setEnabled(true);
     ui->btSwitch->setEnabled(true);
     ui->slZoom->setEnabled(true);
+    ui->spZoom->setEnabled(true);
 }
 
 void MainWindow::switchImage(const int pos)
@@ -287,6 +296,13 @@ void MainWindow::switchImage(const int pos)
             ui->graphicsView->setStyleSheet("border: 2px solid DarkMagenta;");
         }
     }
+}
+
+void MainWindow::setZoom(const int value)
+{
+    const qreal factor = value / 100.0;
+    ui->graphicsView->resetTransform();
+    ui->graphicsView->scale(factor, factor);
 }
 
 QString MainWindow::urlToPath(const QUrl &url)
