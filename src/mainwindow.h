@@ -32,14 +32,13 @@ private:
     Ui::MainWindow *ui;
     QStringList imageFormats;
     QString imageFormatsFilter;
-    QPalette palettePassive;
-    QPalette paletteActive;
+    QPalette paletteDefault, paletteMagenta, paletteGreen;
     QVector<Sheet> sheet;
 
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
 
-    void loadImage(const QString fileName, const int pos);
+    void loadImage(const int pos, QString fileName = QString::null);
     void switchImage(const int pos = INT_MAX);
     QString urlToPath(const QUrl &url);
 };

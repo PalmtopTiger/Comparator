@@ -23,8 +23,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(new QShortcut(Qt::Key_0,      this), &QShortcut::activated, this, &MainWindow::zoomReset);
     connect(new QShortcut(Qt::Key_Insert, this), &QShortcut::activated, this, &MainWindow::zoomReset);
 
-    this->palettePassive = this->paletteActive = ui->btOpen1->palette();
-    this->paletteActive.setColor(QPalette::Button, Qt::green);
+    this->paletteDefault = this->paletteMagenta = this->paletteGreen = ui->btOpen1->palette();
+    this->paletteMagenta.setColor(QPalette::Button, Qt::magenta);
+    this->paletteGreen.setColor(QPalette::Button, Qt::green);
 
     this->setWindowState(Qt::WindowMaximized);
 
@@ -67,7 +68,7 @@ void MainWindow::dropEvent(QDropEvent *event)
             QString path = this->urlToPath(event->mimeData()->urls().at(i));
             if (!path.isEmpty())
             {
-                loadImage(path, i);
+                loadImage(i, path);
             }
         }
         event->acceptProposedAction();
@@ -76,17 +77,17 @@ void MainWindow::dropEvent(QDropEvent *event)
 
 void MainWindow::on_btOpen1_clicked()
 {
-    loadImage(QString::null, 0);
+    loadImage(0);
 }
 
 void MainWindow::on_btOpen2_clicked()
 {
-    loadImage(QString::null, 1);
+    loadImage(1);
 }
 
 void MainWindow::on_btSwitch_clicked()
 {
-    switchImage();
+    if (ui->btSwitch->isEnabled()) switchImage();
 }
 
 void MainWindow::on_slZoom_valueChanged(const int value)
@@ -113,21 +114,21 @@ void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
 
 void MainWindow::zoomIn()
 {
-    ui->slZoom->triggerAction(QAbstractSlider::SliderPageStepAdd);
+    if (ui->slZoom->isEnabled()) ui->slZoom->triggerAction(QAbstractSlider::SliderPageStepAdd);
 }
 
 void MainWindow::zoomOut()
 {
-    ui->slZoom->triggerAction(QAbstractSlider::SliderPageStepSub);
+    if (ui->slZoom->isEnabled()) ui->slZoom->triggerAction(QAbstractSlider::SliderPageStepSub);
 }
 
 void MainWindow::zoomReset()
 {
-    ui->slZoom->setValue(100);
+    if (ui->slZoom->isEnabled()) ui->slZoom->setValue(100);
 }
 
 
-void MainWindow::loadImage(QString fileName, const int pos)
+void MainWindow::loadImage(const int pos, QString fileName)
 {
     if (fileName.isEmpty())
     {
@@ -195,15 +196,11 @@ void MainWindow::loadImage(QString fileName, const int pos)
     }
 
     this->sheet[pos].name = QFileInfo(fileName).fileName();
-    switch (pos)
-    {
-    case 0:
-        ui->btOpen1->setToolTip(this->sheet[pos].name);
-        break;
-
-    case 1:
-        ui->btOpen2->setToolTip(this->sheet[pos].name);
-        break;
+    if (pos) {
+        ui->btOpen2->setText(this->sheet[pos].name);
+    }
+    else {
+        ui->btOpen1->setText(this->sheet[pos].name);
     }
 
     // Центрирование изображения
@@ -222,6 +219,10 @@ void MainWindow::loadImage(QString fileName, const int pos)
     {
         this->sheet[pos].namePalette.setColor(ui->lbName->foregroundRole(), Qt::white);
     }*/
+
+    ui->graphicsView->setEnabled(true);
+    ui->btSwitch->setEnabled(true);
+    ui->slZoom->setEnabled(true);
 }
 
 void MainWindow::switchImage(const int pos)
@@ -243,18 +244,13 @@ void MainWindow::switchImage(const int pos)
         ui->graphicsView->setScene(this->sheet[lastPos].scene);
         ui->graphicsView->centerOn(center);
 
-        ui->lbName->setText(this->sheet[lastPos].name);
-        switch (lastPos)
-        {
-        case 0:
-            ui->btOpen1->setPalette(this->paletteActive);
-            ui->btOpen2->setPalette(this->palettePassive);
-            break;
-
-        case 1:
-            ui->btOpen1->setPalette(this->palettePassive);
-            ui->btOpen2->setPalette(this->paletteActive);
-            break;
+        if (lastPos) {
+            ui->btOpen1->setPalette(this->paletteDefault);
+            ui->btOpen2->setPalette(this->paletteGreen);
+        }
+        else {
+            ui->btOpen2->setPalette(this->paletteDefault);
+            ui->btOpen1->setPalette(this->paletteMagenta);
         }
     }
 }
