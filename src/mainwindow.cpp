@@ -21,9 +21,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(new QShortcut(Qt::Key_0,      this), &QShortcut::activated, this, &MainWindow::zoomReset);
     connect(new QShortcut(Qt::Key_Insert, this), &QShortcut::activated, this, &MainWindow::zoomReset);
 
-    _paletteDefault = _paletteYellow = _paletteGreen = ui->btOpen1->palette();
-    _paletteYellow.setColor(QPalette::Button, Qt::darkYellow);
-    _paletteGreen.setColor(QPalette::Button, Qt::darkGreen);
+    _paletteActive1 = _paletteActive2 = _palettePassive = ui->btOpen1->palette();
+    _paletteActive1.setColor(QPalette::Button, Qt::darkYellow);
+    _paletteActive2.setColor(QPalette::Button, Qt::darkGreen);
 
     ui->graphicsView->viewport()->installEventFilter(this);
 
@@ -286,13 +286,13 @@ void MainWindow::switchImage(const int pos)
         ui->graphicsView->centerOn(center);
 
         if (currentPos) {
-            ui->btOpen1->setPalette(_paletteDefault);
-            ui->btOpen2->setPalette(_paletteGreen);
+            ui->btOpen2->setPalette(_paletteActive2);
+            ui->btOpen1->setPalette(_palettePassive);
             ui->graphicsView->setStyleSheet("border: 2px solid DarkGreen;");
         }
         else {
-            ui->btOpen2->setPalette(_paletteDefault);
-            ui->btOpen1->setPalette(_paletteYellow);
+            ui->btOpen1->setPalette(_paletteActive1);
+            ui->btOpen2->setPalette(_palettePassive);
             ui->graphicsView->setStyleSheet("border: 2px solid Olive;");
         }
     }
