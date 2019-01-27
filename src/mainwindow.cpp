@@ -3,7 +3,6 @@
 #include <QShortcut>
 #include <QFileDialog>
 #include <QFileInfo>
-#include <QSettings>
 #include <QDragEnterEvent>
 #include <QImageReader>
 #include <QMimeData>
@@ -13,8 +12,7 @@ const QString DEFAULT_DIR_KEY = "DefaultDir";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    sheet(2)
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     connect(new QShortcut(Qt::Key_Space,  this), &QShortcut::activated, this, &MainWindow::on_btSwitch_clicked);
@@ -23,24 +21,67 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(new QShortcut(Qt::Key_0,      this), &QShortcut::activated, this, &MainWindow::zoomReset);
     connect(new QShortcut(Qt::Key_Insert, this), &QShortcut::activated, this, &MainWindow::zoomReset);
 
-    this->paletteDefault = this->paletteMagenta = this->paletteGreen = ui->btOpen1->palette();
-    this->paletteMagenta.setColor(QPalette::Button, Qt::darkMagenta);
-    this->paletteGreen.setColor(QPalette::Button, Qt::darkGreen);
+    _paletteDefault = _paletteMagenta = _paletteGreen = ui->btOpen1->palette();
+    _paletteMagenta.setColor(QPalette::Button, Qt::darkMagenta);
+    _paletteGreen.setColor(QPalette::Button, Qt::darkGreen);
+
+    ui->graphicsView->viewport()->installEventFilter(this);
 
     this->setWindowState(Qt::WindowMaximized);
 
     const QByteArrayList supportedImageFormats = QImageReader::supportedImageFormats();
     for (const QByteArray& format : supportedImageFormats)
     {
-        this->imageFormats.append(format);
+        _imageFormats.append(format);
     }
-    this->imageFormats.sort();
-    this->imageFormatsFilter = QString("Изображения (*.%1)").arg(this->imageFormats.join(" *."));
+    _imageFormats.sort();
+    _imageFormatsFilter = QString("Изображения (*.%1)").arg(_imageFormats.join(" *."));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+bool MainWindow::eventFilter(QObject *object, QEvent *event)
+{
+    switch (event->type()) {
+    case QEvent::MouseButtonPress:
+    case QEvent::MouseButtonDblClick:
+        {
+            QMouseEvent* const mouseEvent = static_cast<QMouseEvent *>(event);
+            switch (mouseEvent->button()) {
+            case Qt::MiddleButton:
+                zoomReset();
+                return true;
+
+            case Qt::RightButton:
+                on_btSwitch_clicked();
+                return true;
+
+            default:
+                break;
+            }
+        }
+        break;
+
+    case QEvent::Wheel:
+        {
+            QWheelEvent* const wheelEvent = static_cast<QWheelEvent *>(event);
+            // Только при зажатом Ctrl
+            if (wheelEvent->modifiers() & Qt::ControlModifier)
+            {
+                ui->slZoom->triggerAction(wheelEvent->delta() > 0 ? QAbstractSlider::SliderPageStepAdd : QAbstractSlider::SliderPageStepSub);
+                return true;
+            }
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    return QMainWindow::eventFilter(object, event);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
@@ -63,7 +104,7 @@ void MainWindow::dropEvent(QDropEvent *event)
 {
     if (event->mimeData()->hasUrls())
     {
-        for (int i = 0; i < event->mimeData()->urls().size() && i < this->sheet.size(); ++i)
+        for (int i = 0; i < event->mimeData()->urls().size() && i < 2; ++i)
         {
             QString path = this->urlToPath(event->mimeData()->urls().at(i));
             if (!path.isEmpty())
@@ -103,13 +144,7 @@ void MainWindow::on_slZoom_valueChanged(const int value)
 void MainWindow::on_slZoom_customContextMenuRequested(const QPoint &pos)
 {
     Q_UNUSED(pos);
-    ui->slZoom->setValue(100);
-}
-
-void MainWindow::on_graphicsView_customContextMenuRequested(const QPoint &pos)
-{
-    Q_UNUSED(pos);
-    on_btSwitch_clicked();
+    zoomReset();
 }
 
 void MainWindow::zoomIn()
@@ -132,92 +167,88 @@ void MainWindow::loadImage(const int pos, QString fileName)
 {
     if (fileName.isEmpty())
     {
-        QSettings settings;
         fileName = QFileDialog::getOpenFileName(this,
                                                 QString("Выберите изображение %1").arg(pos + 1),
-                                                settings.value(DEFAULT_DIR_KEY).toString(),
-                                                this->imageFormatsFilter);
+                                                _settings.value(DEFAULT_DIR_KEY).toString(),
+                                                _imageFormatsFilter);
 
         if (fileName.isEmpty()) return;
-        settings.setValue(DEFAULT_DIR_KEY, QFileInfo(fileName).absolutePath());
+        _settings.setValue(DEFAULT_DIR_KEY, QFileInfo(fileName).absolutePath());
     }
 
-    this->sheet[pos].clear();
-    this->sheet[pos].scene = new QGraphicsScene();
-    this->sheet[pos].pixmap = new QPixmap(fileName);
+    Sheet &current = pos ? _sheet2 : _sheet1,
+          &other   = pos ? _sheet1 : _sheet2;
 
-    const int other = (pos + 1) % this->sheet.size();
+    current.clear();
+    current.scene  = new QGraphicsScene();
+    current.pixmap = new QPixmap(fileName);
 
     // Масштабируем
-    if ( this->sheet[other].pixmap && this->sheet[other].scene &&
-         ( this->sheet[other].pixmap->width() > this->sheet[pos].pixmap->width() ||
-           this->sheet[other].pixmap->height() > this->sheet[pos].pixmap->height() ) )
+    if ( other.pixmap && other.scene &&
+         ( other.pixmap->width() > current.pixmap->width() ||
+           other.pixmap->height() > current.pixmap->height() ) )
     {
-        this->sheet[pos].scene->addPixmap( this->sheet[pos].pixmap->scaled(
-            this->sheet[other].pixmap->size(),
+        current.scene->addPixmap( current.pixmap->scaled(
+            other.pixmap->size(),
             Qt::IgnoreAspectRatio,
             Qt::SmoothTransformation) );
-        this->sheet[pos].scaled = true;
+        current.scaled = true;
 
-        if (this->sheet[other].scaled)
+        if (other.scaled)
         {
-            delete this->sheet[other].scene;
-            this->sheet[other].scene = new QGraphicsScene();
-            this->sheet[other].scene->addPixmap(*(this->sheet[other].pixmap));
-            this->sheet[other].scaled = false;
+            delete other.scene;
+            other.scene = new QGraphicsScene();
+            other.scene->addPixmap(*(other.pixmap));
+            other.scaled = false;
         }
     }
     else
     {
-        this->sheet[pos].scene->addPixmap(*(this->sheet[pos].pixmap));
-        this->sheet[pos].scaled = false;
+        current.scene->addPixmap(*(current.pixmap));
+        current.scaled = false;
 
-        if (this->sheet[other].pixmap && sheet[other].scene)
+        if (other.pixmap && other.scene)
         {
-            if (this->sheet[other].pixmap->width() < this->sheet[pos].pixmap->width() ||
-                this->sheet[other].pixmap->height() < this->sheet[pos].pixmap->height())
+            if (other.pixmap->width() < current.pixmap->width() ||
+                other.pixmap->height() < current.pixmap->height())
             {
-                delete this->sheet[other].scene;
-                this->sheet[other].scene = new QGraphicsScene();
-                this->sheet[other].scene->addPixmap( this->sheet[other].pixmap->scaled(
-                    this->sheet[pos].pixmap->size(),
+                delete other.scene;
+                other.scene = new QGraphicsScene();
+                other.scene->addPixmap(other.pixmap->scaled(
+                    current.pixmap->size(),
                     Qt::IgnoreAspectRatio,
-                    Qt::SmoothTransformation) );
-                this->sheet[other].scaled = true;
+                    Qt::SmoothTransformation
+                ));
+                other.scaled = true;
             }
-            else if (this->sheet[other].scaled)
+            else if (other.scaled)
             {
-                delete this->sheet[other].scene;
-                this->sheet[other].scene = new QGraphicsScene();
-                this->sheet[other].scene->addPixmap(*(this->sheet[other].pixmap));
-                this->sheet[other].scaled = false;
+                delete other.scene;
+                other.scene = new QGraphicsScene();
+                other.scene->addPixmap(*(other.pixmap));
+                other.scaled = false;
             }
         }
     }
 
-    this->sheet[pos].name = QFileInfo(fileName).fileName();
-    if (pos) {
-        ui->btOpen2->setText(this->sheet[pos].name);
-    }
-    else {
-        ui->btOpen1->setText(this->sheet[pos].name);
-    }
+    current.name = QFileInfo(fileName).fileName();
+    (pos ? ui->btOpen2 : ui->btOpen1)->setText(current.name);
 
     // Центрирование изображения
     ui->slZoom->setValue(100);
     switchImage(pos);
-    ui->graphicsView->centerOn(QPointF(this->sheet[pos].scene->width() / 2.0,
-                                       this->sheet[pos].scene->height() / 2.0));
+    ui->graphicsView->centerOn(QPointF(current.scene->width() / 2.0,
+                                       current.scene->height() / 2.0));
 
     // Выбор контрастного цвета
-    /*QColor color(this->sheet[pos].pixmap->toImage().pixel(5, 5));
+    /*QColor color(current.pixmap->toImage().pixel(5, 5));
     if ((0.3 * color.redF() + 0.59 * color.greenF() + 0.11 * color.blueF()) > 0.25)
     {
-        this->sheet[pos].namePalette.setColor(ui->lbName->foregroundRole(), Qt::black);
+        current.namePalette.setColor(ui->lbName->foregroundRole(), Qt::black);
     }
     else
     {
-        this->sheet[pos].namePalette.setColor(ui->lbName->foregroundRole(), Qt::white);
+        current.namePalette.setColor(ui->lbName->foregroundRole(), Qt::white);
     }*/
 
     ui->graphicsView->setEnabled(true);
@@ -227,31 +258,32 @@ void MainWindow::loadImage(const int pos, QString fileName)
 
 void MainWindow::switchImage(const int pos)
 {
-    static int lastPos = this->sheet.size() - 1;
+    static int currentPos = 1;
 
-    if (pos >= this->sheet.size())
+    if (pos > 1)
     {
-        lastPos = (lastPos + 1) % this->sheet.size();
+        currentPos = !currentPos;
     }
     else
     {
-        lastPos = pos;
+        currentPos = pos;
     }
 
-    if (this->sheet[lastPos].scene)
+    Sheet &current = currentPos ? _sheet2 : _sheet1;
+    if (current.scene)
     {
         QPointF center = ui->graphicsView->mapToScene(ui->graphicsView->viewport()->rect()).boundingRect().center();
-        ui->graphicsView->setScene(this->sheet[lastPos].scene);
+        ui->graphicsView->setScene(current.scene);
         ui->graphicsView->centerOn(center);
 
-        if (lastPos) {
-            ui->btOpen1->setPalette(this->paletteDefault);
-            ui->btOpen2->setPalette(this->paletteGreen);
+        if (currentPos) {
+            ui->btOpen1->setPalette(_paletteDefault);
+            ui->btOpen2->setPalette(_paletteGreen);
             ui->graphicsView->setStyleSheet("border: 1px solid DarkGreen;");
         }
         else {
-            ui->btOpen2->setPalette(this->paletteDefault);
-            ui->btOpen1->setPalette(this->paletteMagenta);
+            ui->btOpen2->setPalette(_paletteDefault);
+            ui->btOpen1->setPalette(_paletteMagenta);
             ui->graphicsView->setStyleSheet("border: 1px solid DarkMagenta;");
         }
     }
@@ -261,7 +293,7 @@ QString MainWindow::urlToPath(const QUrl &url)
 {
     if (url.isLocalFile()) {
         const QString path = url.toLocalFile();
-        if (this->imageFormats.contains(QFileInfo(path).suffix(), Qt::CaseInsensitive)) {
+        if (_imageFormats.contains(QFileInfo(path).suffix(), Qt::CaseInsensitive)) {
             return path;
         }
     }
