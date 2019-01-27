@@ -21,8 +21,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(new QShortcut(Qt::Key_0,      this), &QShortcut::activated, this, &MainWindow::zoomReset);
     connect(new QShortcut(Qt::Key_Insert, this), &QShortcut::activated, this, &MainWindow::zoomReset);
 
-    _paletteDefault = _paletteMagenta = _paletteGreen = ui->btOpen1->palette();
-    _paletteMagenta.setColor(QPalette::Button, Qt::darkMagenta);
+    _paletteDefault = _paletteYellow = _paletteGreen = ui->btOpen1->palette();
+    _paletteYellow.setColor(QPalette::Button, Qt::darkYellow);
     _paletteGreen.setColor(QPalette::Button, Qt::darkGreen);
 
     ui->graphicsView->viewport()->installEventFilter(this);
@@ -292,8 +292,8 @@ void MainWindow::switchImage(const int pos)
         }
         else {
             ui->btOpen2->setPalette(_paletteDefault);
-            ui->btOpen1->setPalette(_paletteMagenta);
-            ui->graphicsView->setStyleSheet("border: 2px solid DarkMagenta;");
+            ui->btOpen1->setPalette(_paletteYellow);
+            ui->graphicsView->setStyleSheet("border: 2px solid Olive;");
         }
     }
 }

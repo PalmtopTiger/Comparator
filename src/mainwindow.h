@@ -34,7 +34,7 @@ private:
     QSettings _settings;
     QStringList _imageFormats;
     QString _imageFormatsFilter;
-    QPalette _paletteDefault, _paletteMagenta, _paletteGreen;
+    QPalette _paletteDefault, _paletteYellow, _paletteGreen;
     Sheet _sheet1, _sheet2;
 
     void dragEnterEvent(QDragEnterEvent *event);
