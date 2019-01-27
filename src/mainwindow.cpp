@@ -279,12 +279,12 @@ void MainWindow::switchImage(const int pos)
         if (currentPos) {
             ui->btOpen1->setPalette(_paletteDefault);
             ui->btOpen2->setPalette(_paletteGreen);
-            ui->graphicsView->setStyleSheet("border: 1px solid DarkGreen;");
+            ui->graphicsView->setStyleSheet("border: 2px solid DarkGreen;");
         }
         else {
             ui->btOpen2->setPalette(_paletteDefault);
             ui->btOpen1->setPalette(_paletteMagenta);
-            ui->graphicsView->setStyleSheet("border: 1px solid DarkMagenta;");
+            ui->graphicsView->setStyleSheet("border: 2px solid DarkMagenta;");
         }
     }
 }
