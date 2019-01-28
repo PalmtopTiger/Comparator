@@ -46,9 +46,6 @@ private:
     void switchImage(const int pos = INT_MAX);
     void setZoom(const int value);
     QString urlToPath(const QUrl &url);
-
-protected:
-    bool eventFilter(QObject *object, QEvent *event);
 };
 
 #endif // MAINWINDOW_H

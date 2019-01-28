@@ -15,6 +15,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    connect(ui->graphicsView, &QCustomGraphicsView::rightMouseButtonClicked, this, &MainWindow::on_btSwitch_clicked);
+    connect(ui->graphicsView, &QCustomGraphicsView::middleMouseButtonClicked, this, &MainWindow::zoomReset);
+    connect(ui->graphicsView, &QCustomGraphicsView::wheelScrolledUp, this, &MainWindow::zoomIn);
+    connect(ui->graphicsView, &QCustomGraphicsView::wheelScrolledDown, this, &MainWindow::zoomOut);
+
     connect(new QShortcut(Qt::Key_Space,  this), &QShortcut::activated, this, &MainWindow::on_btSwitch_clicked);
     connect(new QShortcut(Qt::Key_Plus,   this), &QShortcut::activated, this, &MainWindow::zoomIn);
     connect(new QShortcut(Qt::Key_Minus,  this), &QShortcut::activated, this, &MainWindow::zoomOut);
@@ -24,8 +30,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _paletteActive1 = _paletteActive2 = _palettePassive = ui->btOpen1->palette();
     _paletteActive1.setColor(QPalette::Button, Qt::darkYellow);
     _paletteActive2.setColor(QPalette::Button, Qt::darkGreen);
-
-    ui->graphicsView->viewport()->installEventFilter(this);
 
     this->setWindowState(Qt::WindowMaximized);
 
@@ -41,47 +45,6 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-bool MainWindow::eventFilter(QObject *object, QEvent *event)
-{
-    switch (event->type()) {
-    case QEvent::MouseButtonPress:
-    case QEvent::MouseButtonDblClick:
-        {
-            QMouseEvent* const mouseEvent = static_cast<QMouseEvent *>(event);
-            switch (mouseEvent->button()) {
-            case Qt::MiddleButton:
-                zoomReset();
-                return true;
-
-            case Qt::RightButton:
-                on_btSwitch_clicked();
-                return true;
-
-            default:
-                break;
-            }
-        }
-        break;
-
-    case QEvent::Wheel:
-        {
-            QWheelEvent* const wheelEvent = static_cast<QWheelEvent *>(event);
-            // Только при зажатом Ctrl
-            if (wheelEvent->modifiers() & Qt::ControlModifier)
-            {
-                ui->slZoom->triggerAction(wheelEvent->delta() > 0 ? QAbstractSlider::SliderPageStepAdd : QAbstractSlider::SliderPageStepSub);
-                return true;
-            }
-        }
-        break;
-
-    default:
-        break;
-    }
-
-    return QMainWindow::eventFilter(object, event);
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)

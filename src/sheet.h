@@ -7,18 +7,10 @@
 class Sheet
 {
 public:
-    Sheet() :
-        pixmap(nullptr),
-        scene(nullptr),
-        scaled(false)
-    {}
-    ~Sheet() { this->clear(); }
+    Sheet();
+    ~Sheet();
 
-    void clear()
-    {
-        delete scene;
-        delete pixmap;
-    }
+    void clear();
 
     QPixmap* pixmap;
     QGraphicsScene* scene;

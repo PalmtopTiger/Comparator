@@ -10,11 +10,14 @@ QT += core gui widgets
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    qcustomgraphicsview.cpp \
+    sheet.cpp
 
 HEADERS += \
     mainwindow.h \
-    sheet.h
+    sheet.h \
+    qcustomgraphicsview.h
 
 FORMS += mainwindow.ui
 
