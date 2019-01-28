@@ -175,6 +175,9 @@
       <property name="enabled">
        <bool>false</bool>
       </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::NoContextMenu</enum>
+      </property>
       <property name="acceptDrops">
        <bool>false</bool>
       </property>
