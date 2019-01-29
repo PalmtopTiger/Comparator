@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include <QShortcut>
 #include <QFileDialog>
-#include <QFileInfo>
 #include <QDragEnterEvent>
 #include <QImageReader>
 #include <QMimeData>

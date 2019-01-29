@@ -1,7 +1,6 @@
 #ifndef SHEET_H
 #define SHEET_H
 
-#include <QPixmap>
 #include <QGraphicsScene>
 
 class Sheet
