@@ -1,5 +1,7 @@
 #include "qcustomgraphicsview.h"
 #include <QMouseEvent>
+#include <QWheelEvent>
+#include <QMessageBox>
 
 QCustomGraphicsView::QCustomGraphicsView(QWidget *parent) :
     QGraphicsView(parent)

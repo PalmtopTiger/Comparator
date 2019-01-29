@@ -4,6 +4,7 @@
 #include "sheet.h"
 #include <QMainWindow>
 #include <QSettings>
+#include <QUrl>
 
 namespace Ui {
     class MainWindow;
