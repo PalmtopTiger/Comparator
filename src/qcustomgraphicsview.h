@@ -8,8 +8,8 @@ class QCustomGraphicsView : public QGraphicsView
     Q_OBJECT
 
 public:
-    QCustomGraphicsView(QWidget *parent = nullptr);
-    QCustomGraphicsView(QGraphicsScene *scene, QWidget *parent = nullptr);
+    explicit QCustomGraphicsView(QWidget *parent = nullptr);
+    explicit QCustomGraphicsView(QGraphicsScene *scene, QWidget *parent = nullptr);
 
 signals:
     void rightMouseButtonClicked();

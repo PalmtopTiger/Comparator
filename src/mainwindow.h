@@ -43,7 +43,8 @@ private:
     void dropEvent(QDropEvent *event);
 
     void loadImage(const int pos, QString fileName = QString::null);
-    void switchImage(const int pos = INT_MAX);
+    void switchImage(const int pos = -1);
+    void centerView(const int pos);
     void setZoom(const int value);
     QString urlToPath(const QUrl &url);
 };

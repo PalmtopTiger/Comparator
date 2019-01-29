@@ -75,6 +75,7 @@ void MainWindow::dropEvent(QDropEvent *event)
                 loadImage(i, path);
             }
         }
+        centerView(0);
         event->acceptProposedAction();
     }
 }
@@ -82,11 +83,13 @@ void MainWindow::dropEvent(QDropEvent *event)
 void MainWindow::on_btOpen1_clicked()
 {
     loadImage(0);
+    centerView(0);
 }
 
 void MainWindow::on_btOpen2_clicked()
 {
     loadImage(1);
+    centerView(1);
 }
 
 void MainWindow::on_btSwitch_clicked()
@@ -203,14 +206,6 @@ void MainWindow::loadImage(const int pos, QString fileName)
     current.name = QFileInfo(fileName).fileName();
     (pos ? ui->btOpen2 : ui->btOpen1)->setText(current.name);
 
-    // Центрирование изображения (не менять на zoomReset - кнопки отключены)
-    setZoom(100);
-    ui->slZoom->setValue(100);
-    ui->spZoom->setValue(100);
-    switchImage(pos);
-    ui->graphicsView->centerOn(QPointF(current.scene->width() / 2.0,
-                                       current.scene->height() / 2.0));
-
     // Выбор контрастного цвета
     /*QColor color(current.pixmap->toImage().pixel(5, 5));
     if ((0.3 * color.redF() + 0.59 * color.greenF() + 0.11 * color.blueF()) > 0.25)
@@ -232,7 +227,7 @@ void MainWindow::switchImage(const int pos)
 {
     static int currentPos = 1;
 
-    if (pos > 1)
+    if (pos < 0 || pos > 1)
     {
         currentPos = !currentPos;
     }
@@ -259,6 +254,13 @@ void MainWindow::switchImage(const int pos)
             ui->graphicsView->setStyleSheet("border: 2px solid Olive;");
         }
     }
+}
+
+void MainWindow::centerView(const int pos)
+{
+    switchImage(pos);
+    zoomReset();
+    ui->graphicsView->centerOn(ui->graphicsView->sceneRect().center());
 }
 
 void MainWindow::setZoom(const int value)
