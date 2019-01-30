@@ -246,13 +246,13 @@ void MainWindow::switchImage(const int pos)
         if (currentPos) {
             ui->btOpen2->setPalette(_paletteActive2);
             ui->btOpen1->setPalette(_palettePassive);
-            ui->graphicsView->setStyleSheet("border: 2px solid DarkGreen;");
         }
         else {
             ui->btOpen1->setPalette(_paletteActive1);
             ui->btOpen2->setPalette(_palettePassive);
-            ui->graphicsView->setStyleSheet("border: 2px solid Olive;");
         }
+
+        ui->graphicsView->setStyleSheet(QString("QCustomGraphicsView { border: 2px solid %1; }").arg(currentPos ? "DarkGreen" : "Olive"));
     }
 }
 
