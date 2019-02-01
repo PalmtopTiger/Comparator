@@ -60,7 +60,8 @@ private:
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
 
-    void loadImage(const int pos, QString fileName = QString::null);
+    QString getOpenFileName();
+    void loadImage(const int pos, const QString &fileName);
     void switchImage(const int pos = -1);
     void centerView(const int pos);
     void setZoom(const int value);

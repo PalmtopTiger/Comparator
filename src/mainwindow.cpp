@@ -100,14 +100,22 @@ void MainWindow::dropEvent(QDropEvent *event)
 
 void MainWindow::on_btOpen1_clicked()
 {
-    loadImage(0);
-    centerView(0);
+    const QString &fileName = getOpenFileName();
+    if (!fileName.isEmpty())
+    {
+        loadImage(0, fileName);
+        centerView(0);
+    }
 }
 
 void MainWindow::on_btOpen2_clicked()
 {
-    loadImage(1);
-    centerView(1);
+    const QString &fileName = getOpenFileName();
+    if (!fileName.isEmpty())
+    {
+        loadImage(1, fileName);
+        centerView(1);
+    }
 }
 
 void MainWindow::on_btSwitch_clicked()
@@ -153,19 +161,20 @@ void MainWindow::zoomReset()
 }
 
 
-void MainWindow::loadImage(const int pos, QString fileName)
+QString MainWindow::getOpenFileName()
 {
-    if (fileName.isEmpty())
-    {
-        fileName = QFileDialog::getOpenFileName(this,
-                                                QString("Выберите изображение %1").arg(pos + 1),
-                                                _settings.value(DEFAULT_DIR_KEY).toString(),
-                                                _imageFormatsFilter);
+    const QString &fileName = QFileDialog::getOpenFileName(this,
+                                                           "Выберите изображение",
+                                                           _settings.value(DEFAULT_DIR_KEY).toString(),
+                                                           _imageFormatsFilter);
 
-        if (fileName.isEmpty()) return;
-        _settings.setValue(DEFAULT_DIR_KEY, QFileInfo(fileName).absolutePath());
-    }
+    if (!fileName.isEmpty()) _settings.setValue(DEFAULT_DIR_KEY, QFileInfo(fileName).absolutePath());
 
+    return fileName;
+}
+
+void MainWindow::loadImage(const int pos, const QString &fileName)
+{
     Sheet &current = pos ? _sheet2 : _sheet1,
           &other   = pos ? _sheet1 : _sheet2;
 
