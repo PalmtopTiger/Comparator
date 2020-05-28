@@ -305,5 +305,5 @@ QString MainWindow::urlToPath(const QUrl &url)
             return path;
         }
     }
-    return QString::null;
+    return QString();
 }
