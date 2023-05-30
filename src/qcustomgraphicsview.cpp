@@ -17,16 +17,26 @@
  */
 
 #include "qcustomgraphicsview.h"
+#include <QOpenGLWidget>
 #include <QMouseEvent>
 #include <QWheelEvent>
 
 QCustomGraphicsView::QCustomGraphicsView(QWidget *parent) :
     QGraphicsView(parent)
-{}
+{
+    initialize();
+}
 
 QCustomGraphicsView::QCustomGraphicsView(QGraphicsScene *scene, QWidget *parent) :
     QGraphicsView(scene, parent)
-{}
+{
+    initialize();
+}
+
+void QCustomGraphicsView::initialize()
+{
+    setViewport(new QOpenGLWidget());
+}
 
 void QCustomGraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
 {

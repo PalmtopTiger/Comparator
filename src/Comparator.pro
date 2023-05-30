@@ -6,7 +6,7 @@
 
 TEMPLATE = app
 
-QT += core gui widgets
+QT += core gui widgets openglwidgets
 
 SOURCES += \
     main.cpp \
