@@ -181,16 +181,18 @@ void MainWindow::loadImage(const int pos, const QString &fileName)
     current.clear();
     current.scene  = new QGraphicsScene();
     current.pixmap = new QPixmap(fileName);
+    current.pixmap->setDevicePixelRatio(qApp->devicePixelRatio());
 
     // Масштабируем
     if ( other.pixmap && other.scene &&
          ( other.pixmap->width() > current.pixmap->width() ||
            other.pixmap->height() > current.pixmap->height() ) )
     {
-        current.scene->addPixmap( current.pixmap->scaled(
+        current.scene->addPixmap(current.pixmap->scaled(
             other.pixmap->size(),
             Qt::IgnoreAspectRatio,
-            Qt::SmoothTransformation) );
+            Qt::SmoothTransformation
+        ));
         current.scaled = true;
 
         if (other.scaled)
