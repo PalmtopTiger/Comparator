@@ -60,7 +60,7 @@ private:
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
 
-    QString getOpenFileName(const QString &dirKey);
+    QString getOpenFileName(const QString &defaultDirKey);
     void loadImage(const int pos, const QString &fileName);
     void switchImage(const int pos = -1);
     void centerView(const int pos);

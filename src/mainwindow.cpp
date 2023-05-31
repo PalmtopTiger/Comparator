@@ -162,14 +162,14 @@ void MainWindow::zoomReset()
 }
 
 
-QString MainWindow::getOpenFileName(const QString &dirKey)
+QString MainWindow::getOpenFileName(const QString &defaultDirKey)
 {
     const QString &fileName = QFileDialog::getOpenFileName(this,
                                                            "Выберите изображение",
-                                                           _settings.value(dirKey).toString(),
+                                                           _settings.value(defaultDirKey).toString(),
                                                            _imageFormatsFilter);
 
-    if (!fileName.isEmpty()) _settings.setValue(dirKey, QFileInfo(fileName).absolutePath());
+    if (!fileName.isEmpty()) _settings.setValue(defaultDirKey, QFileInfo(fileName).absolutePath());
 
     return fileName;
 }
