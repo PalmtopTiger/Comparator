@@ -24,16 +24,16 @@
 QCustomGraphicsView::QCustomGraphicsView(QWidget *parent) :
     QGraphicsView(parent)
 {
-    initialize();
+    init();
 }
 
 QCustomGraphicsView::QCustomGraphicsView(QGraphicsScene *scene, QWidget *parent) :
     QGraphicsView(scene, parent)
 {
-    initialize();
+    init();
 }
 
-void QCustomGraphicsView::initialize()
+void QCustomGraphicsView::init()
 {
     setViewport(new QOpenGLWidget());
 }

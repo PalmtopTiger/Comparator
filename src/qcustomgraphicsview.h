@@ -36,7 +36,7 @@ signals:
     void wheelScrolledDown();
 
 protected:
-    void initialize();
+    void init();
     void mouseDoubleClickEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
