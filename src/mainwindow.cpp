@@ -24,6 +24,7 @@
 #include <QDragEnterEvent>
 #include <QImageReader>
 #include <QMimeData>
+#include <QStyleHints>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -42,6 +43,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(new QShortcut(Qt::Key_Minus,  this), &QShortcut::activated, this, &MainWindow::zoomOut);
     connect(new QShortcut(Qt::Key_0,      this), &QShortcut::activated, this, &MainWindow::zoomReset);
     connect(new QShortcut(Qt::Key_Insert, this), &QShortcut::activated, this, &MainWindow::zoomReset);
+
+    if (qApp->styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
+        ui->graphicsView->setBackgroundBrush(QColor(0x191919));
+    }
 
     _paletteActive1 = _paletteActive2 = _palettePassive = ui->btOpen1->palette();
     _paletteActive1.setColor(QPalette::Button, Qt::darkBlue);
