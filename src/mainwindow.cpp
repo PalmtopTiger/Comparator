@@ -25,7 +25,8 @@
 #include <QImageReader>
 #include <QMimeData>
 
-const QString DEFAULT_DIR_KEY = "DefaultDir";
+const QString DEFAULT_DIR1_KEY = "DefaultDir1",
+              DEFAULT_DIR2_KEY = "DefaultDir2";
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -100,7 +101,7 @@ void MainWindow::dropEvent(QDropEvent *event)
 
 void MainWindow::on_btOpen1_clicked()
 {
-    const QString &fileName = getOpenFileName();
+    const QString &fileName = getOpenFileName(DEFAULT_DIR1_KEY);
     if (!fileName.isEmpty())
     {
         loadImage(0, fileName);
@@ -110,7 +111,7 @@ void MainWindow::on_btOpen1_clicked()
 
 void MainWindow::on_btOpen2_clicked()
 {
-    const QString &fileName = getOpenFileName();
+    const QString &fileName = getOpenFileName(DEFAULT_DIR2_KEY);
     if (!fileName.isEmpty())
     {
         loadImage(1, fileName);
@@ -161,14 +162,14 @@ void MainWindow::zoomReset()
 }
 
 
-QString MainWindow::getOpenFileName()
+QString MainWindow::getOpenFileName(const QString &dirKey)
 {
     const QString &fileName = QFileDialog::getOpenFileName(this,
                                                            "Выберите изображение",
-                                                           _settings.value(DEFAULT_DIR_KEY).toString(),
+                                                           _settings.value(dirKey).toString(),
                                                            _imageFormatsFilter);
 
-    if (!fileName.isEmpty()) _settings.setValue(DEFAULT_DIR_KEY, QFileInfo(fileName).absolutePath());
+    if (!fileName.isEmpty()) _settings.setValue(dirKey, QFileInfo(fileName).absolutePath());
 
     return fileName;
 }
