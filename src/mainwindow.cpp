@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _paletteActive1.setColor(QPalette::Button, Qt::blue);
     _paletteActive2.setColor(QPalette::Button, Qt::darkGreen);
 
-    this->setWindowState(Qt::WindowMaximized);
+    setWindowState(Qt::WindowMaximized);
 
     const QByteArrayList supportedImageFormats = QImageReader::supportedImageFormats();
     for (const QByteArray& format : supportedImageFormats)
@@ -70,7 +70,7 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *event)
         const QList<QUrl> urls = event->mimeData()->urls();
         for (const QUrl &url : urls)
         {
-            if (!this->urlToPath(url).isEmpty())
+            if (!urlToPath(url).isEmpty())
             {
                 event->acceptProposedAction();
                 return;
@@ -85,7 +85,7 @@ void MainWindow::dropEvent(QDropEvent *event)
     {
         for (int i = 0; i < event->mimeData()->urls().size() && i < 2; ++i)
         {
-            QString path = this->urlToPath(event->mimeData()->urls().at(i));
+            QString path = urlToPath(event->mimeData()->urls().at(i));
             if (!path.isEmpty())
             {
                 loadImage(i, path);
