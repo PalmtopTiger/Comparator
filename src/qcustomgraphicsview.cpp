@@ -75,19 +75,13 @@ void QCustomGraphicsView::mousePressEvent(QMouseEvent *event)
 void QCustomGraphicsView::wheelEvent(QWheelEvent *event)
 {
     // Только при зажатом Ctrl
-    if (event->modifiers() & Qt::ControlModifier)
-    {
-        if (event->angleDelta().y() > 0)
-        {
+    if (event->modifiers() & Qt::ControlModifier) {
+        if (event->angleDelta().y() > 0) {
             emit wheelScrolledUp();
-        }
-        else
-        {
+        } else {
             emit wheelScrolledDown();
         }
-    }
-    else
-    {
+    } else {
         QGraphicsView::wheelEvent(event);
     }
 }

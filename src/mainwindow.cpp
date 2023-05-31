@@ -55,8 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowState(Qt::WindowMaximized);
 
     const QByteArrayList supportedImageFormats = QImageReader::supportedImageFormats();
-    for (const QByteArray& format : supportedImageFormats)
-    {
+    for (const QByteArray &format : supportedImageFormats) {
         _imageFormats.append(format);
     }
     _imageFormats.sort();
@@ -70,13 +69,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
-    if (event->mimeData()->hasUrls())
-    {
+    if (event->mimeData()->hasUrls()) {
         const QList<QUrl> urls = event->mimeData()->urls();
-        for (const QUrl &url : urls)
-        {
-            if (!urlToPath(url).isEmpty())
-            {
+        for (const QUrl &url : urls) {
+            if (!urlToPath(url).isEmpty()) {
                 event->acceptProposedAction();
                 return;
             }
@@ -86,13 +82,10 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 
 void MainWindow::dropEvent(QDropEvent *event)
 {
-    if (event->mimeData()->hasUrls())
-    {
-        for (int i = 0; i < event->mimeData()->urls().size() && i < 2; ++i)
-        {
+    if (event->mimeData()->hasUrls()) {
+        for (int i = 0; i < event->mimeData()->urls().size() && i < 2; ++i) {
             QString path = urlToPath(event->mimeData()->urls().at(i));
-            if (!path.isEmpty())
-            {
+            if (!path.isEmpty()) {
                 loadImage(i, path);
             }
         }
@@ -104,8 +97,7 @@ void MainWindow::dropEvent(QDropEvent *event)
 void MainWindow::on_btOpen1_clicked()
 {
     const QString &fileName = getOpenFileName(DEFAULT_DIR1_KEY);
-    if (!fileName.isEmpty())
-    {
+    if (!fileName.isEmpty()) {
         loadImage(0, fileName);
         centerView(0);
     }
@@ -114,8 +106,7 @@ void MainWindow::on_btOpen1_clicked()
 void MainWindow::on_btOpen2_clicked()
 {
     const QString &fileName = getOpenFileName(DEFAULT_DIR2_KEY);
-    if (!fileName.isEmpty())
-    {
+    if (!fileName.isEmpty()) {
         loadImage(1, fileName);
         centerView(1);
     }
@@ -123,7 +114,9 @@ void MainWindow::on_btOpen2_clicked()
 
 void MainWindow::on_btSwitch_clicked()
 {
-    if (ui->btSwitch->isEnabled()) switchImage();
+    if (ui->btSwitch->isEnabled()) {
+        switchImage();
+    }
 }
 
 void MainWindow::on_slZoom_valueChanged(const int value)
@@ -172,7 +165,9 @@ QString MainWindow::getOpenFileName(const QString &defaultDirKey)
                                                            _settings.value(defaultDirKey).toString(),
                                                            _imageFormatsFilter);
 
-    if (!fileName.isEmpty()) _settings.setValue(defaultDirKey, QFileInfo(fileName).absolutePath());
+    if (!fileName.isEmpty()) {
+        _settings.setValue(defaultDirKey, QFileInfo(fileName).absolutePath());
+    }
 
     return fileName;
 }
@@ -188,10 +183,10 @@ void MainWindow::loadImage(const int pos, const QString &fileName)
     current.pixmap->setDevicePixelRatio(qApp->devicePixelRatio());
 
     // Масштабируем
-    if ( other.pixmap && other.scene &&
-         ( other.pixmap->width() > current.pixmap->width() ||
-           other.pixmap->height() > current.pixmap->height() ) )
-    {
+    if (other.pixmap && other.scene && (
+        other.pixmap->width() > current.pixmap->width() ||
+        other.pixmap->height() > current.pixmap->height()
+    )) {
         current.scene->addPixmap(current.pixmap->scaled(
             other.pixmap->size(),
             Qt::IgnoreAspectRatio,
@@ -199,24 +194,21 @@ void MainWindow::loadImage(const int pos, const QString &fileName)
         ));
         current.scaled = true;
 
-        if (other.scaled)
-        {
+        if (other.scaled) {
             delete other.scene;
             other.scene = new QGraphicsScene();
             other.scene->addPixmap(*(other.pixmap));
             other.scaled = false;
         }
-    }
-    else
-    {
+    } else {
         current.scene->addPixmap(*(current.pixmap));
         current.scaled = false;
 
-        if (other.pixmap && other.scene)
-        {
-            if (other.pixmap->width() < current.pixmap->width() ||
-                other.pixmap->height() < current.pixmap->height())
-            {
+        if (other.pixmap && other.scene) {
+            if (
+                other.pixmap->width() < current.pixmap->width() ||
+                other.pixmap->height() < current.pixmap->height()
+            ) {
                 delete other.scene;
                 other.scene = new QGraphicsScene();
                 other.scene->addPixmap(other.pixmap->scaled(
@@ -225,9 +217,7 @@ void MainWindow::loadImage(const int pos, const QString &fileName)
                     Qt::SmoothTransformation
                 ));
                 other.scaled = true;
-            }
-            else if (other.scaled)
-            {
+            } else if (other.scaled) {
                 delete other.scene;
                 other.scene = new QGraphicsScene();
                 other.scene->addPixmap(*(other.pixmap));
@@ -241,12 +231,9 @@ void MainWindow::loadImage(const int pos, const QString &fileName)
 
     // Выбор контрастного цвета
     /*QColor color(current.pixmap->toImage().pixel(5, 5));
-    if ((0.3 * color.redF() + 0.59 * color.greenF() + 0.11 * color.blueF()) > 0.25)
-    {
+    if ((0.3 * color.redF() + 0.59 * color.greenF() + 0.11 * color.blueF()) > 0.25) {
         current.namePalette.setColor(ui->lbName->foregroundRole(), Qt::black);
-    }
-    else
-    {
+    } else {
         current.namePalette.setColor(ui->lbName->foregroundRole(), Qt::white);
     }*/
 
@@ -260,18 +247,14 @@ void MainWindow::switchImage(const int pos)
 {
     static int currentPos = 1;
 
-    if (pos < 0 || pos > 1)
-    {
+    if (pos < 0 || pos > 1) {
         currentPos = !currentPos;
-    }
-    else
-    {
+    } else {
         currentPos = pos;
     }
 
     Sheet &current = currentPos ? _sheet2 : _sheet1;
-    if (current.scene)
-    {
+    if (current.scene) {
         QPointF center = ui->graphicsView->mapToScene(ui->graphicsView->viewport()->rect()).boundingRect().center();
         ui->graphicsView->setScene(current.scene);
         ui->graphicsView->centerOn(center);
@@ -279,8 +262,7 @@ void MainWindow::switchImage(const int pos)
         if (currentPos) {
             ui->btOpen2->setPalette(_paletteActive2);
             ui->btOpen1->setPalette(_palettePassive);
-        }
-        else {
+        } else {
             ui->btOpen1->setPalette(_paletteActive1);
             ui->btOpen2->setPalette(_palettePassive);
         }
