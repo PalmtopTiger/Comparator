@@ -44,8 +44,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(new QShortcut(Qt::Key_Insert, this), &QShortcut::activated, this, &MainWindow::zoomReset);
 
     _paletteActive1 = _paletteActive2 = _palettePassive = ui->btOpen1->palette();
-    _paletteActive1.setColor(QPalette::Button, Qt::blue);
-    _paletteActive2.setColor(QPalette::Button, Qt::darkGreen);
+    _paletteActive1.setColor(QPalette::Button, Qt::darkBlue);
+    _paletteActive2.setColor(QPalette::Button, Qt::darkRed);
 
     setWindowState(Qt::WindowMaximized);
 
@@ -280,7 +280,7 @@ void MainWindow::switchImage(const int pos)
             ui->btOpen2->setPalette(_palettePassive);
         }
 
-        ui->graphicsView->setStyleSheet(QString("QCustomGraphicsView { border: 2px solid %1; }").arg(currentPos ? "Green" : "Blue"));
+        ui->graphicsView->setStyleSheet(QString("QCustomGraphicsView { border: 2px solid %1; }").arg(currentPos ? "DarkRed" : "Blue"));
     }
 }
 
