@@ -25,9 +25,6 @@
 #include <QImageReader>
 #include <QMimeData>
 
-const QString DEFAULT_DIR1_KEY = "DefaultDir1",
-              DEFAULT_DIR2_KEY = "DefaultDir2";
-
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -126,13 +123,12 @@ void MainWindow::on_btSwitch_clicked()
 
 void MainWindow::on_slZoom_valueChanged(const int value)
 {
-    setZoom(value);
     ui->spZoom->setValue(value);
+    setZoom(value);
 }
 
 void MainWindow::on_spZoom_valueChanged(const int value)
 {
-    setZoom(value);
     ui->slZoom->setValue(value);
 }
 
@@ -144,20 +140,22 @@ void MainWindow::on_slZoom_customContextMenuRequested(const QPoint &pos)
 
 void MainWindow::zoomIn()
 {
-    if (ui->slZoom->isEnabled()) ui->slZoom->triggerAction(QAbstractSlider::SliderPageStepAdd);
+    if (ui->slZoom->isEnabled()) {
+        ui->slZoom->setValue(qCeil(ui->slZoom->value() * ZOOM_MULTIPLIER));
+    }
 }
 
 void MainWindow::zoomOut()
 {
-    if (ui->slZoom->isEnabled()) ui->slZoom->triggerAction(QAbstractSlider::SliderPageStepSub);
+    if (ui->slZoom->isEnabled()) {
+        ui->slZoom->setValue(qFloor(ui->slZoom->value() / ZOOM_MULTIPLIER));
+    }
 }
 
 void MainWindow::zoomReset()
 {
     if (ui->slZoom->isEnabled()) {
-        setZoom(100);
         ui->slZoom->setValue(100);
-        ui->spZoom->setValue(100);
     }
 }
 

@@ -66,6 +66,10 @@ private:
     void centerView(const int pos);
     void setZoom(const int value);
     QString urlToPath(const QUrl &url);
+
+    const QString DEFAULT_DIR1_KEY = "DefaultDir1",
+                  DEFAULT_DIR2_KEY = "DefaultDir2";
+    const qreal ZOOM_MULTIPLIER = 1.4;
 };
 
 #endif // MAINWINDOW_H

@@ -16,8 +16,8 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
-    sheet.h \
-    qcustomgraphicsview.h
+    qcustomgraphicsview.h \
+    sheet.h
 
 FORMS += mainwindow.ui
 
