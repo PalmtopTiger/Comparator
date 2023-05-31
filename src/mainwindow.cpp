@@ -44,13 +44,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(new QShortcut(Qt::Key_0,      this), &QShortcut::activated, this, &MainWindow::zoomReset);
     connect(new QShortcut(Qt::Key_Insert, this), &QShortcut::activated, this, &MainWindow::zoomReset);
 
-    if (qApp->styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
-        ui->graphicsView->setBackgroundBrush(QColor(0x191919));
-    }
-
     _paletteActive1 = _paletteActive2 = _palettePassive = ui->btOpen1->palette();
-    _paletteActive1.setColor(QPalette::Button, Qt::darkBlue);
-    _paletteActive2.setColor(QPalette::Button, Qt::darkRed);
+    if (qApp->styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
+        _paletteActive1.setColor(QPalette::Button, Qt::darkBlue);
+        _paletteActive2.setColor(QPalette::Button, Qt::darkRed);
+        ui->graphicsView->setBackgroundBrush(QColor(0x191919));
+    } else {
+        _paletteActive1.setColor(QPalette::Button, Qt::blue);
+        _paletteActive2.setColor(QPalette::Button, Qt::red);
+    }
 
     setWindowState(Qt::WindowMaximized);
 
