@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
     a.setApplicationVersion("0.1");
     a.setOrganizationName("Unlimited Web Works");
     a.setWindowIcon(QIcon(":/main.ico"));
+    a.setStyle("Fusion");
 
     MainWindow w;
     w.show();
