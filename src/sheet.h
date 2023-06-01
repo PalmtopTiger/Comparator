@@ -29,6 +29,9 @@ class Sheet
     QGraphicsScene _scene;
 
 public:
+    explicit Sheet();
+    explicit Sheet(const Sheet &sheet);
+
     void load(const QString &fileName);
     void scale(const QSize &size);
     bool isEmpty() const;

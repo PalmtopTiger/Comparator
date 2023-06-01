@@ -29,7 +29,9 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    _viewStyles({"Blue", "DarkRed"}),
+    _sheets(2)
 {
     ui->setupUi(this);
 
@@ -44,14 +46,21 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(new QShortcut(Qt::Key_0,      this), &QShortcut::activated, this, &MainWindow::zoomReset);
     connect(new QShortcut(Qt::Key_Insert, this), &QShortcut::activated, this, &MainWindow::zoomReset);
 
-    _paletteActive1 = _paletteActive2 = _palettePassive = ui->btOpen1->palette();
+    _buttons = {ui->btOpen1, ui->btOpen2};
+
+    _passivePalette = ui->btOpen1->palette();
+    _activePalettes = {_passivePalette, _passivePalette};
     if (qApp->styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
-        _paletteActive1.setColor(QPalette::Button, Qt::darkBlue);
-        _paletteActive2.setColor(QPalette::Button, Qt::darkRed);
+        _activePalettes[0].setColor(QPalette::Button, Qt::darkBlue);
+        _activePalettes[1].setColor(QPalette::Button, Qt::darkRed);
         ui->graphicsView->setBackgroundBrush(QColor(0x191919));
     } else {
-        _paletteActive1.setColor(QPalette::Button, Qt::blue);
-        _paletteActive2.setColor(QPalette::Button, Qt::red);
+        _activePalettes[0].setColor(QPalette::Button, Qt::blue);
+        _activePalettes[1].setColor(QPalette::Button, Qt::red);
+    }
+
+    for (QString &style : _viewStyles) {
+        style = QString("QCustomGraphicsView { border: 2px solid %1; }").arg(style);
     }
 
     setWindowState(Qt::WindowMaximized);
@@ -176,8 +185,8 @@ QString MainWindow::getOpenFileName(const QString &defaultDirKey)
 
 void MainWindow::loadImage(const int pos, const QString &fileName)
 {
-    Sheet &current = pos ? _sheet2 : _sheet1,
-          &other   = pos ? _sheet1 : _sheet2;
+    Sheet &current = _sheets[pos],
+          &other   = _sheets[!pos];
 
     current.load(fileName);
 
@@ -187,7 +196,7 @@ void MainWindow::loadImage(const int pos, const QString &fileName)
         other.scale(maxSize);
     }
 
-    (pos ? ui->btOpen2 : ui->btOpen1)->setText(QFileInfo(fileName).fileName());
+    _buttons[pos]->setText(QFileInfo(fileName).fileName());
 
     ui->graphicsView->setEnabled(true);
     ui->btSwitch->setEnabled(true);
@@ -195,31 +204,26 @@ void MainWindow::loadImage(const int pos, const QString &fileName)
     ui->spZoom->setEnabled(true);
 }
 
-void MainWindow::switchImage(const int pos)
+void MainWindow::switchImage(const int inputPos)
 {
-    static int currentPos = 1;
+    static int pos = 1;
 
-    if (pos < 0 || pos > 1) {
-        currentPos = !currentPos;
+    if (inputPos < 0 || inputPos > 1) {
+        pos = !pos;
     } else {
-        currentPos = pos;
+        pos = inputPos;
     }
 
-    Sheet &current = currentPos ? _sheet2 : _sheet1;
+    Sheet &current = _sheets[pos];
     if (!current.isEmpty()) {
         QPointF center = ui->graphicsView->mapToScene(ui->graphicsView->viewport()->rect()).boundingRect().center();
         ui->graphicsView->setScene(current.scene());
         ui->graphicsView->centerOn(center);
 
-        if (currentPos) {
-            ui->btOpen2->setPalette(_paletteActive2);
-            ui->btOpen1->setPalette(_palettePassive);
-        } else {
-            ui->btOpen1->setPalette(_paletteActive1);
-            ui->btOpen2->setPalette(_palettePassive);
-        }
+        _buttons[pos]->setPalette(_activePalettes[pos]);
+        _buttons[!pos]->setPalette(_passivePalette);
 
-        ui->graphicsView->setStyleSheet(QString("QCustomGraphicsView { border: 2px solid %1; }").arg(currentPos ? "DarkRed" : "Blue"));
+        ui->graphicsView->setStyleSheet(_viewStyles[pos]);
     }
 }
 

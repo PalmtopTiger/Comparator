@@ -21,7 +21,9 @@
 
 #include "sheet.h"
 #include <QMainWindow>
+#include <QPushButton>
 #include <QSettings>
+#include <QList>
 #include <QUrl>
 
 namespace Ui {
@@ -56,18 +58,18 @@ private:
     QSettings _settings;
     QStringList _imageFormats;
     QString _imageFormatsFilter;
-    QPalette _paletteActive1,
-             _paletteActive2,
-             _palettePassive;
-    Sheet _sheet1,
-          _sheet2;
+    QList<QPushButton*> _buttons;
+    QPalette _passivePalette;
+    QList<QPalette> _activePalettes;
+    QStringList _viewStyles;
+    QList<Sheet> _sheets;
 
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
 
     QString getOpenFileName(const QString &defaultDirKey);
     void loadImage(const int pos, const QString &fileName);
-    void switchImage(const int pos = -1);
+    void switchImage(const int inputPos = -1);
     void centerView(const int pos);
     void setZoom(const int value);
     QString urlToPath(const QUrl &url);

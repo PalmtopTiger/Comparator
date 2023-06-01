@@ -19,6 +19,14 @@
 #include "sheet.h"
 #include <QApplication>
 
+Sheet::Sheet()
+{}
+
+Sheet::Sheet(const Sheet &sheet) :
+    _pixmap(sheet._pixmap),
+    _scaledPixmap(sheet._scaledPixmap)
+{}
+
 void Sheet::load(const QString &fileName)
 {
     _scene.clear();
