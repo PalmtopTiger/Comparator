@@ -24,17 +24,16 @@
 
 class Sheet
 {
+    QPixmap _pixmap;
+    QPixmap _scaledPixmap;
+    QGraphicsScene _scene;
+
 public:
-    Sheet();
-    ~Sheet();
-
-    void clear();
-
-    QPixmap* pixmap;
-    QGraphicsScene* scene;
-
-    QString name;
-    bool scaled;
+    void load(const QString &fileName);
+    void scale(const QSize &size);
+    bool isEmpty() const;
+    const QSize size() const;
+    QGraphicsScene *scene();
 };
 
 #endif // SHEET_H

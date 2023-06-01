@@ -48,6 +48,10 @@ private slots:
     void zoomReset();
 
 private:
+    const QString DEFAULT_DIR1_KEY = "DefaultDir1",
+        DEFAULT_DIR2_KEY = "DefaultDir2";
+    const qreal ZOOM_MULTIPLIER = 1.4;
+
     Ui::MainWindow *ui;
     QSettings _settings;
     QStringList _imageFormats;
@@ -55,7 +59,8 @@ private:
     QPalette _paletteActive1,
              _paletteActive2,
              _palettePassive;
-    Sheet _sheet1, _sheet2;
+    Sheet _sheet1,
+          _sheet2;
 
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
@@ -66,10 +71,6 @@ private:
     void centerView(const int pos);
     void setZoom(const int value);
     QString urlToPath(const QUrl &url);
-
-    const QString DEFAULT_DIR1_KEY = "DefaultDir1",
-                  DEFAULT_DIR2_KEY = "DefaultDir2";
-    const qreal ZOOM_MULTIPLIER = 1.4;
 };
 
 #endif // MAINWINDOW_H

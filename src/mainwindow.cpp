@@ -179,65 +179,15 @@ void MainWindow::loadImage(const int pos, const QString &fileName)
     Sheet &current = pos ? _sheet2 : _sheet1,
           &other   = pos ? _sheet1 : _sheet2;
 
-    current.clear();
-    current.scene  = new QGraphicsScene();
-    current.pixmap = new QPixmap(fileName);
-    current.pixmap->setDevicePixelRatio(qApp->devicePixelRatio());
+    current.load(fileName);
 
-    // Масштабируем
-    if (other.pixmap && other.scene && (
-        other.pixmap->width() > current.pixmap->width() ||
-        other.pixmap->height() > current.pixmap->height()
-    )) {
-        current.scene->addPixmap(current.pixmap->scaled(
-            other.pixmap->size(),
-            Qt::IgnoreAspectRatio,
-            Qt::SmoothTransformation
-        ));
-        current.scaled = true;
-
-        if (other.scaled) {
-            delete other.scene;
-            other.scene = new QGraphicsScene();
-            other.scene->addPixmap(*(other.pixmap));
-            other.scaled = false;
-        }
-    } else {
-        current.scene->addPixmap(*(current.pixmap));
-        current.scaled = false;
-
-        if (other.pixmap && other.scene) {
-            if (
-                other.pixmap->width() < current.pixmap->width() ||
-                other.pixmap->height() < current.pixmap->height()
-            ) {
-                delete other.scene;
-                other.scene = new QGraphicsScene();
-                other.scene->addPixmap(other.pixmap->scaled(
-                    current.pixmap->size(),
-                    Qt::IgnoreAspectRatio,
-                    Qt::SmoothTransformation
-                ));
-                other.scaled = true;
-            } else if (other.scaled) {
-                delete other.scene;
-                other.scene = new QGraphicsScene();
-                other.scene->addPixmap(*(other.pixmap));
-                other.scaled = false;
-            }
-        }
+    if (!other.isEmpty()) {
+        const QSize &maxSize = current.size().expandedTo(other.size());
+        current.scale(maxSize);
+        other.scale(maxSize);
     }
 
-    current.name = QFileInfo(fileName).fileName();
-    (pos ? ui->btOpen2 : ui->btOpen1)->setText(current.name);
-
-    // Выбор контрастного цвета
-    /*QColor color(current.pixmap->toImage().pixel(5, 5));
-    if ((0.3 * color.redF() + 0.59 * color.greenF() + 0.11 * color.blueF()) > 0.25) {
-        current.namePalette.setColor(ui->lbName->foregroundRole(), Qt::black);
-    } else {
-        current.namePalette.setColor(ui->lbName->foregroundRole(), Qt::white);
-    }*/
+    (pos ? ui->btOpen2 : ui->btOpen1)->setText(QFileInfo(fileName).fileName());
 
     ui->graphicsView->setEnabled(true);
     ui->btSwitch->setEnabled(true);
@@ -256,9 +206,9 @@ void MainWindow::switchImage(const int pos)
     }
 
     Sheet &current = currentPos ? _sheet2 : _sheet1;
-    if (current.scene) {
+    if (!current.isEmpty()) {
         QPointF center = ui->graphicsView->mapToScene(ui->graphicsView->viewport()->rect()).boundingRect().center();
-        ui->graphicsView->setScene(current.scene);
+        ui->graphicsView->setScene(current.scene());
         ui->graphicsView->centerOn(center);
 
         if (currentPos) {

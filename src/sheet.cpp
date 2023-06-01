@@ -17,20 +17,53 @@
  */
 
 #include "sheet.h"
+#include <QApplication>
 
-Sheet::Sheet() :
-    pixmap(nullptr),
-    scene(nullptr),
-    scaled(false)
-{}
-
-Sheet::~Sheet()
+void Sheet::load(const QString &fileName)
 {
-    clear();
+    _scene.clear();
+    _scaledPixmap = QPixmap();
+
+    _pixmap.load(fileName);
+    _pixmap.setDevicePixelRatio(qApp->devicePixelRatio());
 }
 
-void Sheet::clear()
+void Sheet::scale(const QSize &size)
 {
-    delete scene;
-    delete pixmap;
+    if (_pixmap.isNull()) {
+        return;
+    }
+
+    _scene.clear();
+
+    if (size == _pixmap.size()) {
+        _scaledPixmap = QPixmap();
+        return;
+    }
+
+    _scaledPixmap = _pixmap.scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+}
+
+bool Sheet::isEmpty() const
+{
+    return _pixmap.isNull();
+}
+
+const QSize Sheet::size() const
+{
+    return _pixmap.size();
+}
+
+QGraphicsScene *Sheet::scene()
+{
+    if (_scene.items().isEmpty()) {
+        if (!_scaledPixmap.isNull()) {
+            _scene.addPixmap(_scaledPixmap);
+        } else if (!_pixmap.isNull()) {
+            _scene.addPixmap(_pixmap);
+        }
+        _scene.setSceneRect(_scene.itemsBoundingRect());
+    }
+
+    return &_scene;
 }
