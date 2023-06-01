@@ -50,14 +50,14 @@ private slots:
     void zoomReset();
 
 private:
-    const QString DEFAULT_DIR1_KEY = "DefaultDir1",
-        DEFAULT_DIR2_KEY = "DefaultDir2";
+    const qsizetype SHEET_COUNT = 2;
     const qreal ZOOM_MULTIPLIER = 1.4;
 
     Ui::MainWindow *ui;
     QSettings _settings;
     QStringList _imageFormats;
     QString _imageFormatsFilter;
+    QStringList _defaultDirKeys;
     QList<QPushButton*> _buttons;
     QPalette _passivePalette;
     QList<QPalette> _activePalettes;

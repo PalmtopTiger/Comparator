@@ -30,8 +30,9 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    _defaultDirKeys(SHEET_COUNT),
     _viewStyles({"Blue", "DarkRed"}),
-    _sheets(2)
+    _sheets(SHEET_COUNT)
 {
     ui->setupUi(this);
 
@@ -46,6 +47,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(new QShortcut(Qt::Key_0,      this), &QShortcut::activated, this, &MainWindow::zoomReset);
     connect(new QShortcut(Qt::Key_Insert, this), &QShortcut::activated, this, &MainWindow::zoomReset);
 
+    for (qsizetype i = 0; i < _defaultDirKeys.size(); ++i) {
+        _defaultDirKeys[i] = QString("DefaultDir%1").arg(i + 1);
+    }
+
     _buttons = {ui->btOpen1, ui->btOpen2};
 
     _passivePalette = ui->btOpen1->palette();
@@ -58,6 +63,8 @@ MainWindow::MainWindow(QWidget *parent) :
         _activePalettes[0].setColor(QPalette::Button, Qt::blue);
         _activePalettes[1].setColor(QPalette::Button, Qt::red);
     }
+    // Заливка фона
+    ui->graphicsView->setScene(_sheets[0].scene());
 
     for (QString &style : _viewStyles) {
         style = QString("QCustomGraphicsView { border: 2px solid %1; }").arg(style);
@@ -80,8 +87,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
-    if (event->mimeData()->hasUrls()) {
-        const QList<QUrl> urls = event->mimeData()->urls();
+    const QMimeData &mimeData = *event->mimeData();
+    if (mimeData.hasUrls()) {
+        const QList<QUrl> &urls = mimeData.urls();
         for (const QUrl &url : urls) {
             if (!urlToPath(url).isEmpty()) {
                 event->acceptProposedAction();
@@ -93,21 +101,34 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 
 void MainWindow::dropEvent(QDropEvent *event)
 {
-    if (event->mimeData()->hasUrls()) {
-        for (int i = 0; i < event->mimeData()->urls().size() && i < 2; ++i) {
-            QString path = urlToPath(event->mimeData()->urls().at(i));
+    const QMimeData &mimeData = *event->mimeData();
+    if (mimeData.hasUrls()) {
+        static int singlePos = 0;
+        const QList<QUrl> &urls = mimeData.urls();
+        if (urls.size() == 1) {
+            const QString path = urlToPath(urls.at(0));
             if (!path.isEmpty()) {
-                loadImage(i, path);
+                loadImage(singlePos, path);
+                centerView(singlePos);
+                singlePos = (singlePos + 1) % SHEET_COUNT;
             }
+        } else {
+            singlePos = 0;
+            for (qsizetype i = 0; i < urls.size() && i < SHEET_COUNT; ++i) {
+                const QString path = urlToPath(urls.at(i));
+                if (!path.isEmpty()) {
+                    loadImage(i, path);
+                }
+            }
+            centerView(0);
         }
-        centerView(0);
         event->acceptProposedAction();
     }
 }
 
 void MainWindow::on_btOpen1_clicked()
 {
-    const QString &fileName = getOpenFileName(DEFAULT_DIR1_KEY);
+    const QString &fileName = getOpenFileName(_defaultDirKeys[0]);
     if (!fileName.isEmpty()) {
         loadImage(0, fileName);
         centerView(0);
@@ -116,7 +137,7 @@ void MainWindow::on_btOpen1_clicked()
 
 void MainWindow::on_btOpen2_clicked()
 {
-    const QString &fileName = getOpenFileName(DEFAULT_DIR2_KEY);
+    const QString &fileName = getOpenFileName(_defaultDirKeys[1]);
     if (!fileName.isEmpty()) {
         loadImage(1, fileName);
         centerView(1);
@@ -168,7 +189,6 @@ void MainWindow::zoomReset()
     }
 }
 
-
 QString MainWindow::getOpenFileName(const QString &defaultDirKey)
 {
     const QString &fileName = QFileDialog::getOpenFileName(this,
@@ -185,14 +205,14 @@ QString MainWindow::getOpenFileName(const QString &defaultDirKey)
 
 void MainWindow::loadImage(const int pos, const QString &fileName)
 {
-    Sheet &current = _sheets[pos],
-          &other   = _sheets[!pos];
+    Sheet &sheet = _sheets[pos],
+          &other = _sheets[!pos];
 
-    current.load(fileName);
+    sheet.load(fileName);
 
     if (!other.isEmpty()) {
-        const QSize &maxSize = current.size().expandedTo(other.size());
-        current.scale(maxSize);
+        const QSize &maxSize = sheet.size().expandedTo(other.size());
+        sheet.scale(maxSize);
         other.scale(maxSize);
     }
 
@@ -207,17 +227,16 @@ void MainWindow::loadImage(const int pos, const QString &fileName)
 void MainWindow::switchImage(const int inputPos)
 {
     static int pos = 1;
-
-    if (inputPos < 0 || inputPos > 1) {
+    if (inputPos < 0 || inputPos >= SHEET_COUNT) {
         pos = !pos;
     } else {
         pos = inputPos;
     }
 
-    Sheet &current = _sheets[pos];
-    if (!current.isEmpty()) {
+    Sheet &sheet = _sheets[pos];
+    if (!sheet.isEmpty()) {
         QPointF center = ui->graphicsView->mapToScene(ui->graphicsView->viewport()->rect()).boundingRect().center();
-        ui->graphicsView->setScene(current.scene());
+        ui->graphicsView->setScene(sheet.scene());
         ui->graphicsView->centerOn(center);
 
         _buttons[pos]->setPalette(_activePalettes[pos]);
