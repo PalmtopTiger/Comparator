@@ -64,11 +64,11 @@ const QSize Sheet::size() const
 
 QGraphicsScene *Sheet::scene()
 {
-    if (_scene.items().isEmpty()) {
-        if (!_scaledPixmap.isNull()) {
-            _scene.addPixmap(_scaledPixmap);
-        } else if (!_pixmap.isNull()) {
+    if (!_pixmap.isNull() && _scene.items().isEmpty()) {
+        if (_scaledPixmap.isNull()) {
             _scene.addPixmap(_pixmap);
+        } else {
+            _scene.addPixmap(_scaledPixmap);
         }
         _scene.setSceneRect(_scene.itemsBoundingRect());
     }
