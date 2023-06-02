@@ -25,6 +25,7 @@
 #include <QImageReader>
 #include <QMimeData>
 #include <QStyleHints>
+#include <QMessageBox>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -208,7 +209,10 @@ void MainWindow::loadImage(const int pos, const QString &fileName)
     Sheet &sheet = _sheets[pos],
           &other = _sheets[!pos];
 
-    sheet.load(fileName);
+    if (!sheet.load(fileName)) {
+        QMessageBox::critical(this, "Ошибка", "Не удалось открыть файл.");
+        return;
+    }
 
     if (!other.isEmpty()) {
         const QSize &maxSize = sheet.size().expandedTo(other.size());

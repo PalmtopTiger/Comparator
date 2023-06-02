@@ -27,13 +27,18 @@ Sheet::Sheet(const Sheet &sheet) :
     _scaledPixmap(sheet._scaledPixmap)
 {}
 
-void Sheet::load(const QString &fileName)
+bool Sheet::load(const QString &fileName)
 {
     _scene.clear();
     _scaledPixmap = QPixmap();
 
-    _pixmap.load(fileName);
+    if (!_pixmap.load(fileName)) {
+        return false;
+    }
+
     _pixmap.setDevicePixelRatio(qApp->devicePixelRatio());
+
+    return true;
 }
 
 void Sheet::scale(const QSize &size)
