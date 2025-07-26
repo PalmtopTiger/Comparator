@@ -86,6 +86,23 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::processCommandLine(const QStringList &args)
+{
+    if (!args.isEmpty()) {
+        int firstPos = -1;
+        for (qsizetype i = 0; i < args.size() && i < SHEET_COUNT; ++i) {
+            const QString &fileName = args[i];
+            if (loadImage(i, fileName) && firstPos < 0) {
+                firstPos = i;
+            }
+        }
+
+        if (firstPos >= 0) {
+            centerView(firstPos);
+        }
+    }
+}
+
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
     const QMimeData &mimeData = *event->mimeData();
@@ -104,24 +121,26 @@ void MainWindow::dropEvent(QDropEvent *event)
 {
     const QMimeData &mimeData = *event->mimeData();
     if (mimeData.hasUrls()) {
-        static int singlePos = 0;
         const QList<QUrl> &urls = mimeData.urls();
         if (urls.size() == 1) {
-            const QString path = urlToPath(urls.at(0));
-            if (!path.isEmpty()) {
-                loadImage(singlePos, path);
-                centerView(singlePos);
-                singlePos = (singlePos + 1) % SHEET_COUNT;
+            static int nextPos = 0;
+            const QString &fileName = urlToPath(urls.at(0));
+            if (loadImage(nextPos, fileName)) {
+                centerView(nextPos);
+                nextPos = (nextPos + 1) % SHEET_COUNT;
             }
         } else {
-            singlePos = 0;
+            int firstPos = -1;
             for (qsizetype i = 0; i < urls.size() && i < SHEET_COUNT; ++i) {
-                const QString path = urlToPath(urls.at(i));
-                if (!path.isEmpty()) {
-                    loadImage(i, path);
+                const QString &fileName = urlToPath(urls.at(i));
+                if (loadImage(i, fileName) && firstPos < 0) {
+                    firstPos = i;
                 }
             }
-            centerView(0);
+
+            if (firstPos >= 0) {
+                centerView(firstPos);
+            }
         }
         event->acceptProposedAction();
     }
@@ -130,8 +149,7 @@ void MainWindow::dropEvent(QDropEvent *event)
 void MainWindow::on_btOpen1_clicked()
 {
     const QString &fileName = getOpenFileName(_defaultDirKeys[0]);
-    if (!fileName.isEmpty()) {
-        loadImage(0, fileName);
+    if (loadImage(0, fileName)) {
         centerView(0);
     }
 }
@@ -139,8 +157,7 @@ void MainWindow::on_btOpen1_clicked()
 void MainWindow::on_btOpen2_clicked()
 {
     const QString &fileName = getOpenFileName(_defaultDirKeys[1]);
-    if (!fileName.isEmpty()) {
-        loadImage(1, fileName);
+    if (loadImage(1, fileName)) {
         centerView(1);
     }
 }
@@ -204,14 +221,18 @@ QString MainWindow::getOpenFileName(const QString &defaultDirKey)
     return fileName;
 }
 
-void MainWindow::loadImage(const int pos, const QString &fileName)
+bool MainWindow::loadImage(const int pos, const QString &fileName)
 {
     Sheet &sheet = _sheets[pos],
           &other = _sheets[!pos];
 
+    if (fileName.isEmpty()) {
+        return false;
+    }
+
     if (!sheet.load(fileName)) {
-        QMessageBox::critical(this, "Ошибка", "Не удалось открыть файл.");
-        return;
+        QMessageBox::critical(this, "Ошибка", QString("Не удалось открыть файл \"%1\"").arg(fileName));
+        return false;
     }
 
     if (!other.isEmpty()) {
@@ -226,6 +247,8 @@ void MainWindow::loadImage(const int pos, const QString &fileName)
     ui->btSwitch->setEnabled(true);
     ui->slZoom->setEnabled(true);
     ui->spZoom->setEnabled(true);
+
+    return true;
 }
 
 void MainWindow::switchImage(const int inputPos)
@@ -252,6 +275,10 @@ void MainWindow::switchImage(const int inputPos)
 
 void MainWindow::centerView(const int pos)
 {
+    if (pos < 0 || pos >= SHEET_COUNT) {
+        return;
+    }
+
     switchImage(pos);
     zoomReset();
     ui->graphicsView->centerOn(ui->graphicsView->sceneRect().center());
@@ -267,7 +294,7 @@ void MainWindow::setZoom(const int value)
 QString MainWindow::urlToPath(const QUrl &url)
 {
     if (url.isLocalFile()) {
-        const QString path = url.toLocalFile();
+        const QString &path = url.toLocalFile();
         if (_imageFormats.contains(QFileInfo(path).suffix(), Qt::CaseInsensitive)) {
             return path;
         }

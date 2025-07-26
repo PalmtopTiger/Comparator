@@ -18,20 +18,31 @@
 
 #include "mainwindow.h"
 #include <QApplication>
+#include <QCommandLineParser>
 
 
 int main(int argc, char *argv[])
 {
     QApplication::setStyle("Fusion");
 
-    QApplication a(argc, argv);
-    a.setApplicationName("Comparator");
-    a.setApplicationVersion("0.9");
-    a.setOrganizationName("Unlimited Web Works");
-    a.setWindowIcon(QIcon(":/main.ico"));
+    QApplication app(argc, argv);
+    app.setApplicationName("Comparator");
+    app.setApplicationVersion("0.9.1");
+    app.setOrganizationName("Unlimited Web Works");
+    app.setWindowIcon(QIcon(":/main.ico"));
 
-    MainWindow w;
-    w.show();
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Программа для сравнения изображений");
+    parser.addHelpOption();
+    parser.addVersionOption();
+    parser.addPositionalArgument("image1", "Первое изображение");
+    parser.addPositionalArgument("image2", "Второе изображение");
+    parser.process(app);
+    const QStringList &args = parser.positionalArguments();
 
-    return a.exec();
+    MainWindow window;
+    window.processCommandLine(args);
+    window.show();
+
+    return app.exec();
 }

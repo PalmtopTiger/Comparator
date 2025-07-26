@@ -37,6 +37,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void processCommandLine(const QStringList &args);
 
 private slots:
     void on_btOpen1_clicked();
@@ -68,7 +69,7 @@ private:
     void dropEvent(QDropEvent *event);
 
     QString getOpenFileName(const QString &defaultDirKey);
-    void loadImage(const int pos, const QString &fileName);
+    bool loadImage(const int pos, const QString &fileName);
     void switchImage(const int inputPos = -1);
     void centerView(const int pos);
     void setZoom(const int value);
